@@ -42,7 +42,7 @@ target_link_libraries(DtDataflowEditor PRIVATE
     fmt::fmt
     imgui::imgui
     imgui::imnodes
-    dt::DtDfCore
-    dt::DtDfPlugin
+    dt::DtDataflowCore
+    dt::DtDataflowPlugin
 )
 install(DIRECTORY include/ TYPE INCLUDE)
