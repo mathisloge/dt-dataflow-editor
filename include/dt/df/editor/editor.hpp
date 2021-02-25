@@ -1,11 +1,11 @@
 #pragma once
 #include "data_flow_graph.hpp"
-#include "dtdfeditor_export.h"
+#include "dtdatafloweditor_export.h"
 #include "types.hpp"
 
 namespace dt::df::editor
 {
-class DTDFEDITOR_EXPORT Editor
+class DTDATAFLOWEDITOR_EXPORT Editor
 {
   public:
     static constexpr std::string_view kDndTarget = "DND_DATAFLOW";

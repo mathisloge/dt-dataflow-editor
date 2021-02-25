@@ -2,12 +2,12 @@
 #include <filesystem>
 #include <functional>
 #include <dt/df/core/types.hpp>
-#include "dtdfeditor_export.h"
+#include "dtdatafloweditor_export.h"
 #include "types.hpp"
 namespace dt::df::editor
 {
 class GraphImpl;
-class DTDFEDITOR_EXPORT DataFlowGraph
+class DTDATAFLOWEDITOR_EXPORT DataFlowGraph
 {
   public:
     DataFlowGraph();
