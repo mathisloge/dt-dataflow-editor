@@ -257,7 +257,7 @@ void GraphImpl::addEdge(const VertexDesc from, const VertexDesc to)
     if (!input_slot)
         assert("input is null. so id isn't correctly set");
 
-    if (!output_slot->canConnect(input_slot.get()))
+    if (!input_slot->canConnect(output_slot.get()))
         return;
 
     auto connection = output_slot->subscribe(
