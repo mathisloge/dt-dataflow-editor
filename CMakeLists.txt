@@ -1,46 +1,48 @@
 cmake_minimum_required(VERSION 3.15)
-project(DtDataFlow
+project(DtDataflowEditor
         VERSION 0.1.0
-        DESCRIPTION "dataflow plugin base"
-        HOMEPAGE_URL https://github.com/mathisloge/dt-dataflow
+        DESCRIPTION "dataflow plugin editor"
+        HOMEPAGE_URL https://github.com/mathisloge/dt-dataflow-editor
         LANGUAGES CXX
 )
-set(BUILD_SHARED_LIBS ON)
 include(GenerateExportHeader)
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+add_subdirectory(dt-dataflow)
 
-add_subdirectory(third-party)
-add_subdirectory(core)
-add_subdirectory(plugin)
-add_subdirectory(editor)
-
-set(DTDF_PLUGIN_INSTALL_DBG_DIR "${CMAKE_INSTALL_PREFIX}/bin/dataflow/dbg")
-set(DTDF_PLUGIN_INSTALL_REL_DIR "${CMAKE_INSTALL_PREFIX}/bin/dataflow/rel")
-
-add_subdirectory(default-plugin)
-
-
-install(TARGETS imgui-imnodes DtDfCore DtDfPlugin DtDfEditor 
-    EXPORT DtDataflowTargets
+find_package(Corrade REQUIRED PluginManager)
+find_package(imgui CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS graph)
+find_package(fmt CONFIG REQUIRED)
+add_library(DtDataflowEditor 
+    src/editor.cpp
+    src/gui.cpp
+    src/data_flow_graph.cpp
+    src/graph_impl.cpp
+    src/node_display_tree.cpp
+    src/priv_types.cpp
 )
+add_library(dt::DtDataflowEditor ALIAS DtDataflowEditor)
+set_property(TARGET DtDataflowEditor PROPERTY CXX_STANDARD 20)
 
-install(EXPORT DtDataflowTargets 
-    FILE DtDataflowTargets.cmake
-    DESTINATION lib/cmake/DtDataflow
-)
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    DtDataflowConfigVersion.cmake
-    VERSION ${PACKAGE_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
-install(EXPORT DtDataflowTargets
-    FILE DtDataflowTargets.cmake
-    NAMESPACE dt::
-    DESTINATION lib/cmake/DtDataflow
+generate_export_header(DtDataflowEditor)
+
+target_include_directories(
+    DtDataflowEditor PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 )
-# todo: enable "docking-experimental" in vcpkg.json
+target_link_libraries(DtDataflowEditor PRIVATE 
+    Corrade::PluginManager
+    Boost::headers
+    Boost::graph
+    fmt::fmt
+    imgui::imgui
+    imgui::imnodes
+    dt::DtDfCore
+    dt::DtDfPlugin
+)
+install(DIRECTORY include/ TYPE INCLUDE)
