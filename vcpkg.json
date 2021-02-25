@@ -1,0 +1,21 @@
+{
+    "name": "dt-device-tester-core",
+    "version-string": "0.1.0",
+    "dependencies": [
+        "spdlog",
+        "catch2",
+        "boost-asio",
+        "boost-signals2",
+        "boost-graph",
+        "boost-circular-buffer",
+        "sol2",
+        "nlohmann-json",
+        "corrade",
+        {
+            "name": "imgui",
+            "features": [
+                
+            ]
+        }
+    ]
+}
