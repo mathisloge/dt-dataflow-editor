@@ -35,7 +35,7 @@ void GraphImpl::init()
         }
         std::unique_ptr<plugin::Plugin> plugin = std::move(manager_.instantiate(plugin_name));
 
-        plugin->setup(ImGui::GetCurrentContext(), imnodes::GetCurrentContext());
+        plugin->setup(Magnum::GL::Context::current(), ImGui::GetCurrentContext(), imnodes::GetCurrentContext());
         plugin->registerSlotFactories(*this);
         loaded_plugins_.emplace_back(std::move(plugin));
     }

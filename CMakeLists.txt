@@ -8,7 +8,7 @@ project(DtDataflowEditor
 include(GenerateExportHeader)
 
 add_subdirectory(dt-dataflow)
-
+find_package(Magnum REQUIRED GL)
 find_package(Corrade REQUIRED PluginManager)
 find_package(imgui CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS graph)
@@ -37,6 +37,8 @@ target_include_directories(
 )
 target_link_libraries(DtDataflowEditor PRIVATE 
     Corrade::PluginManager
+    Magnum::Magnum
+    Magnum::GL
     Boost::headers
     Boost::graph
     fmt::fmt

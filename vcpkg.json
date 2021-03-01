@@ -10,10 +10,14 @@
         "nlohmann-json",
         "corrade",
         {
-            "name": "imgui",
+            "name": "magnum",
             "features": [
-                
+                "gl"
             ]
+        },
+        {
+            "name": "imgui",
+            "features": []
         }
     ]
 }
