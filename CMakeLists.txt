@@ -34,8 +34,8 @@ generate_export_header(DtDataflowEditor)
 target_include_directories(
     DtDataflowEditor PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/include>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(DtDataflowEditor PRIVATE 
     Corrade::PluginManager
@@ -50,3 +50,41 @@ target_link_libraries(DtDataflowEditor PRIVATE
     dt::DtDataflowPlugin
 )
 install(DIRECTORY include/ TYPE INCLUDE)
+install(FILES
+    ${PROJECT_BINARY_DIR}/dtdatafloweditor_export.h
+    DESTINATION include/dt/df/editor
+)
+
+install(TARGETS DtDataflowEditor
+    EXPORT DtDataflowEditorTargets
+)
+
+install(EXPORT DtDataflowEditorTargets 
+    FILE DtDataflowEditorTargets.cmake
+    DESTINATION lib/cmake/DtDataflowEditor
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/DtDataflowEditorConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/DtDataflowEditor
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+write_basic_package_version_file(
+    DtDataflowEditorConfigVersion.cmake
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(EXPORT DtDataflowEditorTargets
+    FILE DtDataflowEditorTargets.cmake
+    NAMESPACE dt::
+    DESTINATION lib/cmake/DtDataflowEditor
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/DtDataflowEditorConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/DtDataflowEditorConfigVersion.cmake
+    DESTINATION lib/cmake/DtDataflowEditor
+)
