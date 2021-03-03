@@ -7,6 +7,8 @@ project(DtDataflowEditor
 )
 include(GenerateExportHeader)
 
+option(BUILD_SHARED_LIBS "build as a shared library" ON)
+
 add_subdirectory(dt-dataflow)
 find_package(Magnum REQUIRED GL)
 find_package(Corrade REQUIRED PluginManager)
