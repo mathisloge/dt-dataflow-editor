@@ -9,12 +9,12 @@ include(GenerateExportHeader)
 
 option(BUILD_SHARED_LIBS "build as a shared library" ON)
 
-add_subdirectory(dt-dataflow)
 find_package(Magnum REQUIRED GL)
 find_package(Corrade REQUIRED PluginManager)
 find_package(imgui CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS graph)
 find_package(fmt CONFIG REQUIRED)
+find_package(DtDataFlow CONFIG REQUIRED)
 add_library(DtDataflowEditor 
     src/editor.cpp
     src/gui.cpp
@@ -45,7 +45,7 @@ target_link_libraries(DtDataflowEditor PRIVATE
     Boost::graph
     fmt::fmt
     imgui::imgui
-    imgui::imnodes
+    dt::imnodes
     dt::DtDataflowCore
     dt::DtDataflowPlugin
 )
