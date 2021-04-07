@@ -18,9 +18,6 @@ namespace dt::df::editor
 {
 
 GraphImpl::GraphImpl()
-    : run_evaluation_{true}
-    , evaluation_thread_{std::bind(&GraphImpl::evaluationTask, this)}
-    , evaluation_queue_{200}
 {}
 
 void GraphImpl::init()
@@ -182,7 +179,6 @@ void GraphImpl::removeNode(const NodeId id)
 
 VertexDesc GraphImpl::addSlot(const NodePtr &node, const VertexDesc node_vert, const SlotPtr &slot, const SlotType type)
 {
-    slot->connectEvaluation(std::bind(&GraphImpl::reevaluateSlot, this, std::placeholders::_1));
     return addVertex(
         node_vert, slot->id(), node->id(), type == SlotType::input ? VertexType::input : VertexType::output);
 }
@@ -369,27 +365,6 @@ void GraphImpl::renderLinks()
     }
 }
 
-void GraphImpl::evaluationTask()
-{
-    while (run_evaluation_)
-    {
-        SlotId slot_id;
-        evaluation_queue_.pop_back(&slot_id);
-        if (slot_id < 0)
-            continue;
-
-        auto slot = findSlotById(slot_id);
-        if (slot)
-            slot->valueChanged();
-    }
-}
-
-void GraphImpl::reevaluateSlot(SlotId slot)
-{
-    //! \todo we need to detect circles!
-    evaluation_queue_.push_front(slot);
-}
-
 void GraphImpl::save(const std::filesystem::path &file)
 {
     using json = nlohmann::json;
@@ -493,9 +468,5 @@ const NodeDisplayGraph &GraphImpl::nodeDisplayNames() const
 
 GraphImpl::~GraphImpl()
 {
-    evaluation_queue_.push_front(-1); // wake up
-    run_evaluation_ = false;
-    if (evaluation_thread_.joinable())
-        evaluation_thread_.join();
 }
 } // namespace dt::df::editor

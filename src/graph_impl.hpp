@@ -58,8 +58,6 @@ class GraphImpl final : public IGraphManager
     const NodeDeserializationFactory &getNodeDeserializationFactory(const NodeKey &key) const;
     VertexDesc addVertex(const VertexDesc node_desc, const int id, const int parent_id, VertexType type);
     void removeNodeSlots(const Slots &slots);
-    void evaluationTask();
-    void reevaluateSlot(SlotId slot);
     SlotPtr findSlotById(const SlotId) const;
     NodePtr findNodeById(const NodeId) const;
 
@@ -75,9 +73,5 @@ class GraphImpl final : public IGraphManager
     std::unordered_map<SlotKey, SlotDeserializationFactory> slot_deser_factories_;
     NodeDisplayGraph node_display_names_;
     std::unordered_map<NodeId, NodePtr> nodes_;
-
-    bool run_evaluation_;
-    std::thread evaluation_thread_;
-    bounded_buffer<SlotId> evaluation_queue_;
 };
 } // namespace dt::df::editor
