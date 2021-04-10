@@ -152,6 +152,10 @@ void GraphImpl::addNode(const NodePtr &node)
 
     for (auto &slot : node->outputs())
         addSlot(node, node_vertex, slot, SlotType::output);
+
+    // -1 is reserved for the both flow slots!
+    addSlot(node, node_vertex, node->inputByLocalId(-1), SlotType::input);
+    addSlot(node, node_vertex, node->outputByLocalId(-1), SlotType::output);
 }
 
 void GraphImpl::removeNode(const NodeId id)
@@ -467,6 +471,5 @@ const NodeDisplayGraph &GraphImpl::nodeDisplayNames() const
 }
 
 GraphImpl::~GraphImpl()
-{
-}
+{}
 } // namespace dt::df::editor
