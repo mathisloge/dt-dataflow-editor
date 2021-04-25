@@ -15,7 +15,7 @@
 #include "priv_types.hpp"
 namespace dt::df::editor
 {
-class GraphImpl final : public IGraphManager
+class GraphImpl final : public core::IGraphManager
 {
   public:
     GraphImpl();
@@ -57,7 +57,7 @@ class GraphImpl final : public IGraphManager
     const NodeFactory &getNodeFactory(const NodeKey &key) const;
     const NodeDeserializationFactory &getNodeDeserializationFactory(const NodeKey &key) const;
     VertexDesc addVertex(const VertexDesc node_desc, const int id, const int parent_id, VertexType type);
-    void removeNodeSlots(const Slots &slots);
+    void removeNodeSlots(const SlotMap &slots);
     SlotPtr findSlotById(const SlotId) const;
     NodePtr findNodeById(const NodeId) const;
 

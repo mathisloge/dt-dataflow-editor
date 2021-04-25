@@ -8,7 +8,6 @@
 #include <Corrade/Utility/Debug.h>
 #include <dt/df/core/base_node.hpp>
 #include <dt/df/core/base_slot.hpp>
-#include <dt/df/core/json.hpp>
 #include <dt/df/plugin/plugin.hpp>
 #include <imnodes.h>
 #include <nlohmann/json.hpp>
@@ -148,10 +147,10 @@ void GraphImpl::addNode(const NodePtr &node)
     const auto node_vertex = addVertex(0, node->id(), -1, VertexType::node);
 
     for (auto &slot : node->inputs())
-        addSlot(node, node_vertex, slot, SlotType::input);
+        addSlot(node, node_vertex, slot.second, SlotType::input);
 
     for (auto &slot : node->outputs())
-        addSlot(node, node_vertex, slot, SlotType::output);
+        addSlot(node, node_vertex, slot.second, SlotType::output);
 
     // -1 is reserved for the both flow slots!
     addSlot(node, node_vertex, node->inputByLocalId(-1), SlotType::input);
@@ -201,8 +200,8 @@ void GraphImpl::removeSlot(const SlotId slot_id)
                 const auto in_edges = boost::in_edges(*vi, graph_);
                 for (auto it = in_edges.first; it != in_edges.second; it++)
                 {
-                    auto slot_in = findSlotById(graph_[boost::source(*it, graph_)].id);
-                    slot_in->disconnectEvent();
+                    const auto &edge_prop = boost::get(EdgeInfo_t(), graph_, *it);
+                    edge_prop.connection->connection.disconnect();
                 }
             }
             else if (graph_[*vi].type == VertexType::output)
@@ -210,8 +209,8 @@ void GraphImpl::removeSlot(const SlotId slot_id)
                 const auto out_edges = boost::out_edges(*vi, graph_);
                 for (auto it = out_edges.first; it != out_edges.second; it++)
                 {
-                    auto slot_in = findSlotById(graph_[boost::target(*it, graph_)].id);
-                    slot_in->disconnectEvent();
+                    const auto &edge_prop = boost::get(EdgeInfo_t(), graph_, *it);
+                    edge_prop.connection->connection.disconnect();
                 }
             }
             boost::clear_vertex(*vi, graph_);
@@ -257,17 +256,13 @@ void GraphImpl::addEdge(const VertexDesc from, const VertexDesc to)
     if (!input_slot)
         assert("input is null. so id isn't correctly set");
 
-    if (!input_slot->canConnect(output_slot.get()))
+    if (!input_slot->canConnectTo(output_slot->key()))
         return;
 
-    auto connection = output_slot->subscribe(
-        BaseSlot::ValueChangedSignal::slot_type(std::bind(&BaseSlot::accept, input_slot.get(), std::placeholders::_1))
-            .track_foreign(input_slot));
+    auto connection = input_slot->connectTo(output_slot);
 
     const EdgeInfo egde_prop{link_id_counter_++, std::make_shared<RefCon>(std::move(connection))};
     boost::add_edge(from, to, std::move(egde_prop), graph_);
-    output_slot->connectEvent();
-    input_slot->connectEvent();
 }
 
 void GraphImpl::removeEdge(const EdgeId id)
@@ -283,12 +278,7 @@ void GraphImpl::removeEdge(const EdgeId id)
                 const auto &edge_prop = boost::get(EdgeInfo_t(), graph_, *eeit);
                 if (edge_prop.id == id)
                 {
-                    const auto edge_source = boost::source(*eeit, graph_);
-                    const auto edge_target = boost::target(*eeit, graph_);
-                    auto slot_source = findSlotById(graph_[edge_source].id);
-                    slot_source->disconnectEvent();
-                    auto slot_target = findSlotById(graph_[edge_target].id);
-                    slot_target->disconnectEvent();
+                    edge_prop.connection->connection.disconnect();
                     boost::remove_edge(*eeit, graph_);
                     break;
                 }
@@ -308,11 +298,11 @@ VertexDesc GraphImpl::findVertexById(const NodeId id) const
     throw std::out_of_range("vertex with id not found");
 }
 
-void GraphImpl::removeNodeSlots(const Slots &slots)
+void GraphImpl::removeNodeSlots(const SlotMap &slots)
 {
     for (const auto &slot : slots)
     {
-        removeSlot(slot->id());
+        removeSlot(slot.second->id());
     }
 }
 
@@ -371,13 +361,14 @@ void GraphImpl::renderLinks()
 
 void GraphImpl::save(const std::filesystem::path &file)
 {
+#if 0
     using json = nlohmann::json;
 
     json all_json;
     json nodes_json = json::array();
     for (const auto &node : nodes_)
     {
-        nodes_json.push_back(*node.second);
+        //nodes_json.push_back(*node.second);
     }
     all_json["nodes"] = std::move(nodes_json);
 
@@ -395,10 +386,12 @@ void GraphImpl::save(const std::filesystem::path &file)
 
     std::ofstream o(file);
     o << all_json << std::endl;
+#endif
 }
 
 void GraphImpl::clearAndLoad(const std::filesystem::path &file)
 {
+#if 0
     using nlohmann::json;
     if (!std::filesystem::exists(file) || !std::filesystem::is_regular_file(file))
     {
@@ -445,16 +438,17 @@ void GraphImpl::clearAndLoad(const std::filesystem::path &file)
             highest_vertex_id = node.second->id();
         for (const auto &slot : node.second->inputs())
         {
-            if (slot->id() > highest_vertex_id)
-                highest_vertex_id = slot->id();
+            if (slot.second->id() > highest_vertex_id)
+                highest_vertex_id = slot.second->id();
         }
         for (const auto &slot : node.second->outputs())
         {
-            if (slot->id() > highest_vertex_id)
-                highest_vertex_id = slot->id();
+            if (slot.second->id() > highest_vertex_id)
+                highest_vertex_id = slot.second->id();
         }
     }
     vertex_id_counter_ = highest_vertex_id + 1;
+#endif
 }
 
 void GraphImpl::clear()
