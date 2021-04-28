@@ -257,10 +257,10 @@ void GraphImpl::addEdge(const VertexDesc from, const VertexDesc to)
     if (!input_slot)
         assert("input is null. so id isn't correctly set");
 
-    if (!input_slot->canConnectTo(output_slot->key()))
+    if (!output_slot->canConnectTo(input_slot->key()))
         return;
 
-    auto connection = input_slot->connectTo(output_slot);
+    auto connection = output_slot->connectTo(input_slot);
 
     const EdgeInfo egde_prop{link_id_counter_++, std::make_shared<RefCon>(std::move(connection))};
     boost::add_edge(from, to, std::move(egde_prop), graph_);
