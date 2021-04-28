@@ -137,7 +137,7 @@ const SlotDeserializationFactory &GraphImpl::getSlotDeserFactory(const SlotKey &
 void GraphImpl::createNode(const NodeKey &key, int preferred_x, int preferred_y, bool screen_space)
 {
     auto node = getNodeFactory(key)(*this);
-    node->init();
+    node->init(*this);
     addNode(node);
     node->setPosition(preferred_x, preferred_y, screen_space);
 }
@@ -154,8 +154,8 @@ void GraphImpl::addNode(const NodePtr &node)
         addSlot(node, node_vertex, slot.second, SlotType::output);
 
     // -1 is reserved for the both flow slots!
-    addSlot(node, node_vertex, node->inputByLocalId(-1), SlotType::input);
-    addSlot(node, node_vertex, node->outputByLocalId(-1), SlotType::output);
+    //addSlot(node, node_vertex, node->inputByLocalId(-1), SlotType::input);
+    //addSlot(node, node_vertex, node->outputByLocalId(-1), SlotType::output);
 }
 
 void GraphImpl::removeNode(const NodeId id)
