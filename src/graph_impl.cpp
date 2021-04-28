@@ -137,6 +137,7 @@ const SlotDeserializationFactory &GraphImpl::getSlotDeserFactory(const SlotKey &
 void GraphImpl::createNode(const NodeKey &key, int preferred_x, int preferred_y, bool screen_space)
 {
     auto node = getNodeFactory(key)(*this);
+    node->init();
     addNode(node);
     node->setPosition(preferred_x, preferred_y, screen_space);
 }
