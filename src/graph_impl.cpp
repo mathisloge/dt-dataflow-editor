@@ -152,10 +152,6 @@ void GraphImpl::addNode(const NodePtr &node)
 
     for (auto &slot : node->outputs())
         addSlot(node, node_vertex, slot.second, SlotType::output);
-
-    // -1 is reserved for the both flow slots!
-    //addSlot(node, node_vertex, node->inputByLocalId(-1), SlotType::input);
-    //addSlot(node, node_vertex, node->outputByLocalId(-1), SlotType::output);
 }
 
 void GraphImpl::removeNode(const NodeId id)
@@ -264,6 +260,8 @@ void GraphImpl::addEdge(const VertexDesc from, const VertexDesc to)
 
     const EdgeInfo egde_prop{link_id_counter_++, std::make_shared<RefCon>(std::move(connection))};
     boost::add_edge(from, to, std::move(egde_prop), graph_);
+
+    from_node->second->onConnect();
 }
 
 void GraphImpl::removeEdge(const EdgeId id)
