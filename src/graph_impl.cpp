@@ -277,6 +277,9 @@ void GraphImpl::removeEdge(const EdgeId id)
                 const auto &edge_prop = boost::get(EdgeInfo_t(), graph_, *eeit);
                 if (edge_prop.id == id)
                 {
+                    const auto edge_source = boost::source(*eeit, graph_);
+                    auto node_source = findNodeById(graph_[edge_source].parent_id);
+                    node_source->beforeDisconnect();
                     edge_prop.connection->connection.disconnect();
                     boost::remove_edge(*eeit, graph_);
                     break;
